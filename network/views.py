@@ -4,7 +4,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from .models import User
+from .models import User, Posts
 
 
 def index(request):
@@ -61,3 +61,13 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "network/register.html")
+
+
+def new_post(request):
+    if request.method == "POST":
+        post = Posts(user=request.user, content=request.POST["content"])
+        print(post)
+        post.save()
+        return HttpResponseRedirect(reverse('index'))
+    
+    return HttpResponse("Error: This page only accepts post requests")
