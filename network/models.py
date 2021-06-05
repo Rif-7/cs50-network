@@ -12,3 +12,7 @@ class Posts(models.Model):
     time = models.DateTimeField(auto_now_add=True)
     def __str__(self):
         return f"{self.user}: {self.content} @{self.time}. Likes: {self.like}"
+
+class Like(models.Model):
+    post = models.ForeignKey(Posts, on_delete=models.CASCADE, related_name="liked_usr")
+    liked_users = models.ManyToManyField(User, blank=True, related_name="liked_posts")

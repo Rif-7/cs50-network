@@ -1,5 +1,5 @@
 {% extends "network/layout.html" %}
-
+{% load static %}
 {% block body %}
     <div id="all_posts">
         <div id="post-form">
@@ -14,7 +14,31 @@
             </form>
         </div>
         <div id="posts">
-            All the posts should be here
+            {% for post in posts %}
+                <div class="post-item">
+                    <label class="post-content">
+                        <p class="post-user">{{ post.user }}</p>
+                        <label class="time-data">{{ post.time }}</label>
+                        <br/>
+                        <p class="post-text">{{ post.content }}</p>
+                        {% if post.id in liked_posts %}
+                            <div id="like-btn-{{ post.id }}">
+                                <a class="like-btn" onclick="like_post('{{ post.id }}');">
+                                    💖<label class="bi-heart" id="like-no-{{ post.id }}">{{ post.like }}</label>   
+                                </a>                         
+                            </div>
+                        {% else %}
+                            <div id="like-btn-{{ post.id }}">
+                                <a class="like-btn" onclick="like_post('{{ post.id }}');">
+                                    ❤<label class="bi-heart" id="like-no-{{ post.id }}">{{ post.like }}</label>   
+                                </a>                         
+                            </div>
+                        {% endif %}
+                                       
+
+                    </label>
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock %}
