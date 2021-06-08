@@ -1,25 +1,21 @@
 {% extends "network/layout.html" %}
 {% load static %}
 {% block body %}
+    <label id="user-head"><h1>{{ usr }}
+        {% if request.user.is_authenticated and request.user != usr %}
+            <label>
+            <button onclick="follow('{{ usr.id }}');" class="btn btn-dark" id="follow-btn">{{ btnText }}</button>
+            </label>
+            {% endif %}
+        </h1>
+        <p id="follow-data">Followers: {{ followers }} | Following: {{ followings }}</p>
+    </label>
+
     <div id="all_posts">
-        <div id="post-form">
-            <h4>New Post</h4>
-            <form action="{% url 'new-post' %}" method="POST">
-                {% csrf_token %}
-                <div class="input-group">
-                    <span class="input-group-text bar-nav">New Post</span>
-                    <textarea class="form-control" aria-label="With textarea" name="content"></textarea>
-                    <input type="submit" class="btn btn-dark">
-                </div>
-            </form>
-        </div>
         <div id="posts">
             {% for post in posts %}
                 <div class="post-item">
                     <label class="post-content">
-                        <p class="post-user">
-                            <a href="{% url 'user-posts' post.user.id %}" class="post-user"> {{ post.user }} </a>
-                        </p>
                         <label class="time-data">{{ post.time }}</label>
                         <br/>
                         <p class="post-text">{{ post.content }}</p>

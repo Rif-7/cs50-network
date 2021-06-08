@@ -1,3 +1,4 @@
+from django import http
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.db.utils import ProgrammingError
@@ -7,7 +8,7 @@ from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
 
-from .models import User, Posts, Like
+from .models import User, Posts, Like , Follower
 
 
 def index(request):
@@ -19,7 +20,6 @@ def index(request):
                 if usr == request.user:
                     liked_posts.append(post.id)
 
-    print(liked_posts)
     return render(request, "network/index.html", {
         "posts": posts,
         "liked_posts": liked_posts,
@@ -68,6 +68,7 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
+            user_f = Follower(user=User).save()
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -103,11 +104,76 @@ def like_post(request, post_id):
             l = l.liked_users
         for usr in l.all():
             if request.user == usr:
-                return JsonResponse({"stat": "Already Liked"}, status=200)
+                l.remove(request.user)
+                post.like = l.count()
+                post.save()
+                return JsonResponse({"stat": "Success", "likes": l.count(), "action": "u"}, status=200)
+            
         l.add(request.user)
         post.like = l.count()
         post.save()
         
-        return JsonResponse({"stat": "Success"}, status=200)
+        return JsonResponse({"stat": "Success", "likes": l.count(), "action": "l"}, status=200)
     
     return HttpResponse("This page only accepts Post requests")
+
+@csrf_exempt
+def view_user(request, user_id):
+    if request.method == "POST":
+        usr_followed = User.objects.get(pk=user_id)
+        usr_following = request.user
+        follow_data = usr_followed.follows.first()
+        if usr_following in follow_data.followers.all():
+            follow_data.followers.remove(usr_following)
+            usr_following.follows.first().followed_users.remove(usr_followed)
+            return JsonResponse({
+            "stat": "Follow",
+            "followers": follow_data.followers.all().count(),
+             "following": follow_data.followed_users.all().count()}, status=200)
+        else:
+            follow_data.followers.add(usr_following)
+            usr_following.follows.first().followed_users.add(usr_followed)
+            return JsonResponse({
+            "stat": "Unfollow", 
+            "followers": follow_data.followers.all().count(),
+            "following": follow_data.followed_users.all().count()}, status=200)
+
+    usr_ = User.objects.get(pk=user_id)
+    posts = usr_.user_posts.all().order_by("-time")
+    liked_posts = []
+    for post in posts:
+        for p in post.liked_usr.all():
+            for usr in p.liked_users.all():
+                if usr == request.user:
+                    liked_posts.append(post.id)
+    
+    followers = usr_.follows.first().followers.all()
+    f = "Follow"
+    if request.user in followers:
+        f = "Unfollow"
+    followings = usr_.follows.first().followed_users.all()
+    return render(request, "network/user.html", {
+        "posts": posts,
+        "liked_posts": liked_posts,
+        "usr": usr_,
+        "followers": len(followers),
+        "followings": len(followings),
+        "btnText": f
+        
+    })
+
+
+def follow_view(request):
+    followed_usr = Follower.objects.get(user=request.user).followed_users.all()
+    posts = Posts.objects.filter(user__in=followed_usr)
+    liked_posts = []
+    for post in posts:
+        for p in post.liked_usr.all():
+            for usr in p.liked_users.all():
+                if usr == request.user:
+                    liked_posts.append(post.id)
+
+    return render(request, "network/index.html", {
+        "posts": posts,
+        "liked_posts": liked_posts,
+    })
