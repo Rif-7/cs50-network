@@ -15,14 +15,17 @@
         </div>
         <div id="posts">
             {% for post in posts %}
-                <div class="post-item">
-                    <label class="post-content">
+                <div class="post-item post-content" id="post-item-{{ post.id }}">
                         <p class="post-user">
-                            <a href="{% url 'user-posts' post.user.id %}" class="post-user"> {{ post.user }} </a>
+                            <a href="{% url 'user-posts' post.user.id %}" class="post-user"> {{ post.user }}</a>
+                            {% if post.user ==  request.user %}
+                                <button onclick="edit_request('{{ post.id }}');" type="button" class="btn btn-link" >Edit</button>
+                            {% endif %}
                         </p>
+
                         <label class="time-data">{{ post.time }}</label>
                         <br/>
-                        <p class="post-text">{{ post.content }}</p>
+                        <div class="post-text" id="post-text-{{ post.id }}">{{ post.content }}</div>
                         {% if post.id in liked_posts %}
                             <div id="like-btn-{{ post.id }}">
                                 <a class="like-btn" onclick="like_post('{{ post.id }}');">
@@ -37,10 +40,21 @@
                             </div>
                         {% endif %}
                                        
-
-                    </label>
                 </div>
             {% endfor %}
         </div>
     </div>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+          <li class="page-item disabled">
+            <a class="page-link" href="#" tabindex="-1" aria-disabled="true">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
+    </nav>
 {% endblock %}

@@ -1,3 +1,4 @@
+import json
 from django import http
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
@@ -7,19 +8,23 @@ from django.http.response import JsonResponse
 from django.shortcuts import render
 from django.urls import reverse
 from django.views.decorators.csrf import csrf_exempt
+from django.core.paginator import Paginator
 
 from .models import User, Posts, Like , Follower
 
-
-def index(request):
-    posts = Posts.objects.all().order_by('-time')
+def liked_list(posts, user):
     liked_posts = []
     for post in posts:
         for p in post.liked_usr.all():
             for usr in p.liked_users.all():
-                if usr == request.user:
+                if usr == user:
                     liked_posts.append(post.id)
+    return liked_posts
 
+def index(request):
+    posts = Posts.objects.all().order_by('-time')
+    posts = Paginator(posts, 10).page(1)
+    liked_posts = liked_list(posts, request.user)
     return render(request, "network/index.html", {
         "posts": posts,
         "liked_posts": liked_posts,
@@ -68,7 +73,8 @@ def register(request):
         try:
             user = User.objects.create_user(username, email, password)
             user.save()
-            user_f = Follower(user=User).save()
+            user_f = Follower(user=user)
+            user_f.save()
         except IntegrityError:
             return render(request, "network/register.html", {
                 "message": "Username already taken."
@@ -123,6 +129,7 @@ def view_user(request, user_id):
         usr_followed = User.objects.get(pk=user_id)
         usr_following = request.user
         follow_data = usr_followed.follows.first()
+
         if usr_following in follow_data.followers.all():
             follow_data.followers.remove(usr_following)
             usr_following.follows.first().followed_users.remove(usr_followed)
@@ -140,18 +147,14 @@ def view_user(request, user_id):
 
     usr_ = User.objects.get(pk=user_id)
     posts = usr_.user_posts.all().order_by("-time")
-    liked_posts = []
-    for post in posts:
-        for p in post.liked_usr.all():
-            for usr in p.liked_users.all():
-                if usr == request.user:
-                    liked_posts.append(post.id)
-    
+    liked_posts = liked_list(posts, request.user)
     followers = usr_.follows.first().followers.all()
+    
     f = "Follow"
     if request.user in followers:
         f = "Unfollow"
     followings = usr_.follows.first().followed_users.all()
+    
     return render(request, "network/user.html", {
         "posts": posts,
         "liked_posts": liked_posts,
@@ -177,3 +180,18 @@ def follow_view(request):
         "posts": posts,
         "liked_posts": liked_posts,
     })
+
+
+@csrf_exempt
+def edit_post(request, post_id):
+    if request.method == "POST":
+        post = Posts.objects.get(pk=post_id)
+        if post.user == request.user:
+            data = json.loads(request.body).get("edited")
+            post.content = data
+            post.save()
+            return JsonResponse({"stat": "Success", "content": data}, status=200)
+        else:
+            return JsonResponse({"stat": "Failed"}, status=404)
+    else:
+        return HttpResponse("Try harder")

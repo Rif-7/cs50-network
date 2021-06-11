@@ -3,9 +3,7 @@
 {% block body %}
     <label id="user-head"><h1>{{ usr }}
         {% if request.user.is_authenticated and request.user != usr %}
-            <label>
-            <button onclick="follow('{{ usr.id }}');" class="btn btn-dark" id="follow-btn">{{ btnText }}</button>
-            </label>
+                <button onclick="follow('{{ usr.id }}');" class="btn btn-dark" id="follow-btn">{{ btnText }}</button>
             {% endif %}
         </h1>
         <p id="follow-data">Followers: {{ followers }} | Following: {{ followings }}</p>

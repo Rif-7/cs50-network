@@ -31,6 +31,7 @@ body {
 .time-data {
     color: burlywood;
     font-size: medium;
+    margin-top: 1px;
 }
 
 .like-btn {
@@ -66,4 +67,14 @@ body {
 
 #follow-data {
     font-size: medium;
+}
+
+.btn-link {
+    padding-left: 1px;
+    padding-bottom: 1px;    
+    padding-top: 1px;
+}
+
+.page-item {
+    background-color: gray;
 }
