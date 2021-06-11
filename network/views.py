@@ -21,9 +21,16 @@ def liked_list(posts, user):
                     liked_posts.append(post.id)
     return liked_posts
 
-def index(request):
+
+def get_page(page_id):
+    if page_id == 1:
+        HttpResponseRedirect(reverse("index"))
     posts = Posts.objects.all().order_by('-time')
-    posts = Paginator(posts, 10).page(1)
+    return Paginator(posts, 10).page(page_id)
+
+
+def index(request):
+    posts = get_page(1)
     liked_posts = liked_list(posts, request.user)
     return render(request, "network/index.html", {
         "posts": posts,
@@ -195,3 +202,12 @@ def edit_post(request, post_id):
             return JsonResponse({"stat": "Failed"}, status=404)
     else:
         return HttpResponse("Try harder")
+
+def page_load(request, page_no):
+    posts = get_page(page_no)
+    liked_posts = liked_list(posts, request.user)
+    return render(request, "network/index.html", {
+        "posts": posts,
+        "liked_posts": liked_posts,
+    })
+    
