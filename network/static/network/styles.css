@@ -35,7 +35,8 @@ body {
 }
 
 .like-btn {
-    fill: red;
+    background-color: transparent;
+    border: 1px solid #505050;
     font-size: medium;
 }
 
