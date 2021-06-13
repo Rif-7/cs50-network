@@ -2,17 +2,19 @@
 {% load static %}
 {% block body %}
     <div id="all_posts">
-        <div id="post-form">
-            <h4>New Post</h4>
-            <form action="{% url 'new-post' %}" method="POST">
-                {% csrf_token %}
-                <div class="input-group">
-                    <span class="input-group-text bar-nav">New Post</span>
-                    <textarea class="form-control" aria-label="With textarea" name="content"></textarea>
-                    <input type="submit" class="btn btn-dark">
-                </div>
-            </form>
-        </div>
+        {% if request.user.is_authenticated %}
+            <div id="post-form">
+                <h4>New Post</h4>
+                <form action="{% url 'new-post' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <span class="input-group-text bar-nav">New Post</span>
+                        <textarea class="form-control" aria-label="With textarea" name="content"></textarea>
+                        <input type="submit" class="btn btn-dark">
+                    </div>
+                </form>
+            </div>
+        {% endif %}
         <div id="posts">
             {% for post in posts %}
                 <div class="post-item post-content" id="post-item-{{ post.id }}">
@@ -57,7 +59,7 @@
         <ul class="pagination justify-content-center">
         {% if posts.has_previous %}
           <li>
-            <a href="{% url 'page' posts.previous_page_number %}">
+            <a href="{% url pages posts.previous_page_number %}">
               <button class="btn btn-dark">Previous</button>
             </a>
         </li>
@@ -73,7 +75,7 @@
         </li>
         {% if posts.has_next %}
           <li>
-            <a href="{% url 'page' posts.next_page_number %}">
+            <a href="{% url pages posts.next_page_number %}">
                 <button class="btn btn-dark">Next</button>
             </a>
           </li>

@@ -35,6 +35,7 @@ def index(request):
     return render(request, "network/index.html", {
         "posts": posts,
         "liked_posts": liked_posts,
+        "pages": "page"
     })
 
 
@@ -173,19 +174,16 @@ def view_user(request, user_id):
     })
 
 
-def follow_view(request):
+def follow_view(request, page_id):
     followed_usr = Follower.objects.get(user=request.user).followed_users.all()
     posts = Posts.objects.filter(user__in=followed_usr)
-    liked_posts = []
-    for post in posts:
-        for p in post.liked_usr.all():
-            for usr in p.liked_users.all():
-                if usr == request.user:
-                    liked_posts.append(post.id)
+    posts = Paginator(posts, 10).page(page_id)
+    liked_posts = liked_list(posts, request.user)
 
     return render(request, "network/index.html", {
         "posts": posts,
         "liked_posts": liked_posts,
+        "pages": "following"
     })
 
 
@@ -209,5 +207,6 @@ def page_load(request, page_no):
     return render(request, "network/index.html", {
         "posts": posts,
         "liked_posts": liked_posts,
+        "pages": "page"
     })
     
