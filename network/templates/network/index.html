@@ -19,7 +19,7 @@
             {% for post in posts %}
                 <div class="post-item post-content" id="post-item-{{ post.id }}">
                         <p class="post-user">
-                            <a href="{% url 'user-posts' post.user.id %}" class="post-user"> {{ post.user }}</a>
+                            <a href="{% url 'user-posts' post.user.id 1 %}" class="post-user"> {{ post.user }}</a>
                             {% if post.user ==  request.user %}
                                 <button onclick="edit_request('{{ post.id }}');" type="button" class="btn btn-link" >Edit</button>
                             {% endif %}

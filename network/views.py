@@ -23,8 +23,6 @@ def liked_list(posts, user):
 
 
 def get_page(page_id):
-    if page_id == 1:
-        HttpResponseRedirect(reverse("index"))
     posts = Posts.objects.all().order_by('-time')
     return Paginator(posts, 10).page(page_id)
 
@@ -132,7 +130,7 @@ def like_post(request, post_id):
     return HttpResponse("This page only accepts Post requests")
 
 @csrf_exempt
-def view_user(request, user_id):
+def view_user(request, user_id, page_no):
     if request.method == "POST":
         usr_followed = User.objects.get(pk=user_id)
         usr_following = request.user
@@ -153,8 +151,10 @@ def view_user(request, user_id):
             "followers": follow_data.followers.all().count(),
             "following": follow_data.followed_users.all().count()}, status=200)
 
+    
     usr_ = User.objects.get(pk=user_id)
     posts = usr_.user_posts.all().order_by("-time")
+    posts = Paginator(posts, 10).page(page_no)
     liked_posts = liked_list(posts, request.user)
     followers = usr_.follows.first().followers.all()
     
