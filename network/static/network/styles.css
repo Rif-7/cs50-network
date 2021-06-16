@@ -7,6 +7,15 @@ body {
     color: gray;
 }
 
+.navbar-nav {
+    display: flex;
+    flex-direction: row;
+}
+
+.nav-item, .navbar-brand {
+    padding-left: 10px;
+}
+
 #post-form {
     color: white;
     margin: 10px;

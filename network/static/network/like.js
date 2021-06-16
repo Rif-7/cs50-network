@@ -33,7 +33,7 @@ function like_post(post_id) {
 
 function follow(user_id) {
     
-    fetch(`/user/${user_id}`, {
+    fetch(`/user/${user_id}/page/1`, {
     method: "POST"
     })
     .then(response => response.json())
@@ -61,6 +61,10 @@ function edit_request(post_id) {
     btn_sub.className = "btn btn-dark";
     btn_sub.innerHTML = "Sumbit";
     btn_sub.addEventListener('click', function () {
+        if (document.getElementById(`edit-${post_id}`).value == '') {
+            alert("This field can't be empty");
+            return false;
+        }
         fetch(`/edit/${post_id}`, {
             method: "POST",
             body: JSON.stringify({
