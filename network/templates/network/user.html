@@ -64,28 +64,28 @@
         {% if posts.has_previous %}
         <li>
             <a href="{% url 'user-posts' usr.id posts.previous_page_number %}">
-                <button class="btn btn-dark">Previous</button>
+                <button class="btn btn-secondary"> << </button>
             </a>
         </li>
         {% else %}
         <li>
-            <button class="btn btn-dark" disabled>Previous</button>
+            <button class="btn btn-secondary" disabled> << </button>
         </li>
         {% endif %}
         <li>
             <a href="#">
-                <button class="btn btn-dark">Page {{ posts.number }}</button>
+                <button class="btn btn-secondary active">Page {{ posts.number }}</button>
             </a>
         </li>
         {% if posts.has_next %}
         <li>
             <a href="{% url 'user-posts' usr.id posts.next_page_number %}">
-                <button class="btn btn-dark">Next</button>
+                <button class="btn btn-secondary"> >> </button>
             </a>
         </li>
         {% else %}
         <li>
-            <button class="btn btn-dark" disabled>Next</button>
+            <button class="btn btn-secondary" disabled> >> </button>
         </li>
         {% endif %}
     </ul>
