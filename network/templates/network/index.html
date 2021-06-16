@@ -79,12 +79,12 @@
             {% if posts.has_previous %}
             <li>
                 <a href="{% url pages posts.previous_page_number %}">
-                <button class="btn btn-secondary"> << </button>
+                <button class="btn btn-secondary"> &laquo; </button>
                 </a>
             </li>
             {% else %}
             <li>
-                <button class="btn btn-secondary" disabled> << </button>
+                <button class="btn btn-secondary" disabled> &laquo; </button>
             </li>
             {% endif %}
             <li>
@@ -95,12 +95,12 @@
             {% if posts.has_next %}
             <li>
                 <a href="{% url pages posts.next_page_number %}">
-                    <button class="btn btn-secondary"> >> </button>
+                    <button class="btn btn-secondary"> &raquo; </button>
                 </a>
             </li>
             {% else %}
                 <li>
-                    <button class="btn btn-secondary" disabled>>></button>
+                    <button class="btn btn-secondary" disabled> &raquo; </button>
                 </li>
             {% endif %}
             </ul>
